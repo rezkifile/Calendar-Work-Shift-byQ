@@ -1,0 +1,473 @@
+:root {
+  --bg-page: #f1f5f9;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+
+  /* Warna Shift */
+  --pagi-bg: #dcfce7;
+  --pagi-border: #22c55e;
+  --pagi-text: #14532d;
+
+  --malam-bg: #dbeafe;
+  --malam-border: #3b82f6;
+  --malam-text: #1e3a8a;
+
+  --off-bg: #fee2e2;
+  --off-border: #ef4444;
+  --off-text: #7f1d1d;
+
+  --leave-bg: #f3e8ff;
+  --leave-border: #a855f7;
+  --leave-text: #581c87;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-main);
+  padding-bottom: 40px;
+}
+
+.app-header {
+  background: #0f172a;
+  color: #fff;
+  padding: 16px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-header h1 {
+  font-size: 1.25rem;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+input[type="date"], input[type="text"], select {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.quick-gen span {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.btn-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+.btn-gen {
+  background: #e2e8f0;
+  color: var(--text-main);
+  padding: 8px 4px;
+  font-size: 0.85rem;
+}
+
+.btn-gen.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-outline {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.btn-outline.full-width {
+  width: 100%;
+  background: #f8fafc;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+}
+
+/* Navigasi Kalender */
+.calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.calendar-nav h2 {
+  font-size: 1.05rem;
+}
+
+.nav-btn {
+  background: #f1f5f9;
+  padding: 8px 14px;
+  font-size: 1rem;
+}
+
+/* Legenda */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.72rem;
+}
+
+.badge-legend {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.badge-legend.pagi { background: var(--pagi-bg); color: var(--pagi-text); }
+.badge-legend.malam { background: var(--malam-bg); color: var(--malam-text); }
+.badge-legend.off { background: var(--off-bg); color: var(--off-text); }
+.badge-legend.leave { background: var(--leave-bg); color: var(--leave-text); }
+.badge-legend.holiday-work {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+  color: #78350f;
+}
+
+/* Grid Kalender */
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.day-cell {
+  min-height: 64px;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1.5px solid transparent;
+  position: relative;
+  cursor: pointer;
+  background: #f8fafc;
+}
+
+.day-cell.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.day-cell.today {
+  box-shadow: 0 0 0 2px #0f172a;
+}
+
+/* Warna Status Shift */
+.day-cell.shift-PAGI {
+  background: var(--pagi-bg);
+  border-color: var(--pagi-border);
+  color: var(--pagi-text);
+}
+
+.day-cell.shift-MALAM {
+  background: var(--malam-bg);
+  border-color: var(--malam-border);
+  color: var(--malam-text);
+}
+
+.day-cell.shift-OFF {
+  background: var(--off-bg);
+  border-color: var(--off-border);
+  color: var(--off-text);
+}
+
+.day-cell.shift-SAKIT,
+.day-cell.shift-UNPAID,
+.day-cell.shift-CUTI {
+  background: var(--leave-bg);
+  border-color: var(--leave-border);
+  color: var(--leave-text);
+}
+
+/* Tampilan Khusus: Kerja (Pagi/Malam) di Tanggal Merah Nasional */
+.day-cell.holiday-overtime {
+  background: linear-gradient(135deg, #fffbeb 0%, #fde68a 50%, #f59e0b 100%) !important;
+  border: 2px solid #d97706 !important;
+  color: #78350f !important;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.35);
+}
+
+.day-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.holiday-dot {
+  width: 7px;
+  height: 7px;
+  background: #dc2626;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.day-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 2px 0;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.65);
+}
+
+.ot-flame {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-align: center;
+  color: #92400e;
+}
+
+/* Laporan Bulanan */
+.report-panel h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-box {
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.stat-box.highlight-ot {
+  background: #fffbeb;
+  border-color: #fcd34d;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.leave-summary {
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.leave-summary h4 {
+  margin-bottom: 6px;
+  color: #581c87;
+}
+
+.leave-summary ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 14px;
+  padding: 16px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  background: none;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+}
+
+.holiday-alert {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-left: 4px solid #d97706;
+  color: #78350f;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.holiday-alert.hidden {
+  display: none;
+}
+
+.info-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-holiday-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.holiday-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.holiday-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+}
+
+.btn-del-holiday {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+}
