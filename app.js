@@ -1,7 +1,3 @@
-/**
- * KONFIGURASI & ATURAN SHIFT
- * Mudah diubah/di-upgrade di masa depan
- */
 const APP_CONFIG = {
   ROTATION_PATTERN: ['PAGI', 'PAGI', 'MALAM', 'MALAM', 'OFF', 'OFF'],
   SHIFT_DETAILS: {
@@ -25,7 +21,6 @@ const MONTH_NAMES = [
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ];
 
-// State Aplikasi
 let state = {
   startDate: '',
   generateMonths: 3,
@@ -44,7 +39,6 @@ let state = {
 let activeHolidaysMap = {};
 let selectedDateStr = null;
 
-// --- INISIALISASI ---
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   setupEventListeners();
@@ -76,7 +70,8 @@ function loadState() {
     state.startDate = formatDateISO(new Date());
   }
 
-  document.getElementById('start-date').value = state.startDate;
+  const startInput = document.getElementById('start-date');
+  if (startInput) startInput.value = state.startDate;
   highlightActiveGenButton();
 }
 
@@ -84,7 +79,6 @@ function saveState() {
   localStorage.setItem(APP_CONFIG.STORAGE_KEY, JSON.stringify(state));
 }
 
-// --- FORMAT & UTILITAS ---
 function formatDateISO(dateObj) {
   const y = dateObj.getFullYear();
   const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -98,8 +92,8 @@ function parseDateISO(isoStr) {
 }
 
 function diffDays(startIso, targetIso) {
-  const d1 = Date.UTC(...startIso.split('-').map((v, i) => i === 1 ? Number(v) - 1 : Number(v)));
-  const d2 = Date.UTC(...targetIso.split('-').map((v, i) => i === 1 ? Number(v) - 1 : Number(v)));
+  const d1 = Date.UTC(...startIso.split('-').map((v, i) => (i === 1 ? Number(v) - 1 : Number(v))));
+  const d2 = Date.UTC(...targetIso.split('-').map((v, i) => (i === 1 ? Number(v) - 1 : Number(v))));
   return Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
 }
 
@@ -107,7 +101,6 @@ function formatRupiah(amount) {
   return 'Rp ' + Math.round(amount || 0).toLocaleString('id-ID');
 }
 
-// --- LOGIKA ROTASI & STATUS HARIAN ---
 function getBaseShift(targetIso) {
   if (!state.startDate) return null;
   const delta = diffDays(state.startDate, targetIso);
@@ -155,7 +148,6 @@ function getEffectiveDayData(targetIso) {
   };
 }
 
-// --- PERHITUNGAN LEMBUR KEMNAKER (PP NO. 35 / 2021) ---
 function getHourlyWage() {
   const baseSalary = Number(state.salaryConfig.baseSalary) || 0;
   return baseSalary / APP_CONFIG.KEMNAKER_DIVISOR;
@@ -168,32 +160,40 @@ function calculateOvertimePayForDay(otHours, isHoliday) {
   if (isHoliday) {
     const multiplier = Math.min(otHours, 7) * 2 + Math.max(0, otHours - 7) * 3;
     return hourly * multiplier;
-  } else {
-    const firstHour = Math.min(otHours, 1) * 1.5;
-    const nextHours = Math.max(0, otHours - 1) * 2;
-    return hourly * (firstHour + nextHours);
   }
+
+  const firstHour = Math.min(otHours, 1) * 1.5;
+  const nextHours = Math.max(0, otHours - 1) * 2;
+  return hourly * (firstHour + nextHours);
 }
 
-// --- TANGGAL MERAH NASIONAL (API + FALLBACK + OFFLINE CACHE) ---
 async function loadHolidaysForYear(year) {
   const cacheKey = APP_CONFIG.HOLIDAY_CACHE_PREFIX + year;
   let apiHolidays = {};
 
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
-    apiHolidays = JSON.parse(cached);
+    try {
+      apiHolidays = JSON.parse(cached);
+    } catch (e) {
+      apiHolidays = {};
+    }
   } else {
     try {
       const res = await fetch(`https://dayoffapi.vercel.app/api?year=${year}`);
       if (res.ok) {
         const data = await res.json();
-        data.forEach(item => {
-          const parts = item.tanggal.split('-');
-          const normDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
-          apiHolidays[normDate] = item.keterangan;
-        });
-        localStorage.setItem(cacheKey, JSON.stringify(apiHolidays));
+        if (Array.isArray(data)) {
+          data.forEach((item) => {
+            if (!item || !item.tanggal) return;
+            const parts = String(item.tanggal).split('-');
+            if (parts.length === 3) {
+              const normDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+              apiHolidays[normDate] = item.keterangan || 'Hari Libur Nasional';
+            }
+          });
+          localStorage.setItem(cacheKey, JSON.stringify(apiHolidays));
+        }
       }
     } catch (err) {
       console.warn('Mode offline / gagal ambil API tanggal merah:', err);
@@ -218,7 +218,6 @@ async function loadHolidaysForYear(year) {
   });
 }
 
-// --- RENDER KALENDER & LAPORAN ---
 async function renderAll() {
   await loadHolidaysForYear(state.viewYear);
   renderCalendar();
@@ -227,9 +226,13 @@ async function renderAll() {
 
 function renderCalendar() {
   const grid = document.getElementById('calendar-grid');
+  if (!grid) return;
   grid.innerHTML = '';
 
-  document.getElementById('current-month-label').textContent = `${MONTH_NAMES[state.viewMonth]} ${state.viewYear}`;
+  const monthLabel = document.getElementById('current-month-label');
+  if (monthLabel) {
+    monthLabel.textContent = `${MONTH_NAMES[state.viewMonth]} ${state.viewYear}`;
+  }
 
   const firstDay = new Date(state.viewYear, state.viewMonth, 1).getDay();
   const daysInMonth = new Date(state.viewYear, state.viewMonth + 1, 0).getDate();
@@ -327,19 +330,20 @@ function isNextMonthFromNow(viewYear, viewMonth) {
 
 function renderMonthlyReport() {
   const monthLabel = `${MONTH_NAMES[state.viewMonth]} ${state.viewYear}`;
-  document.getElementById('report-month-name').textContent = monthLabel;
+  const reportTitleEl = document.getElementById('report-month-name');
+  if (reportTitleEl) reportTitleEl.textContent = monthLabel;
 
   const unavailableBox = document.getElementById('report-unavailable-box');
   const contentBox = document.getElementById('report-content-box');
 
   if (isNextMonthFromNow(state.viewYear, state.viewMonth)) {
-    unavailableBox.classList.remove('hidden');
-    contentBox.classList.add('hidden');
+    if (unavailableBox) unavailableBox.classList.remove('hidden');
+    if (contentBox) contentBox.classList.add('hidden');
     return;
   }
 
-  unavailableBox.classList.add('hidden');
-  contentBox.classList.remove('hidden');
+  if (unavailableBox) unavailableBox.classList.add('hidden');
+  if (contentBox) contentBox.classList.remove('hidden');
 
   const daysInMonth = new Date(state.viewYear, state.viewMonth + 1, 0).getDate();
   let confirmedDaysCount = 0;
@@ -396,7 +400,6 @@ function renderMonthlyReport() {
     `Upah/jam reguler (1/173): ${formatRupiah(getHourlyWage())} • Skema ${state.salaryConfig.workdayScheme} hari/minggu`;
 }
 
-// --- MODAL & INTERAKSI PENGGUNA ---
 function toggleAbsentReasonField() {
   const attVal = document.getElementById('attendance-select').value;
   const reasonGroup = document.getElementById('absent-reason-group');
@@ -415,7 +418,9 @@ function openDayModal(dateIso) {
 
   const holidayBanner = document.getElementById('modal-holiday-banner');
   if (info.holidayName) {
-    holidayBanner.textContent = `🗓️ Tanggal Merah: ${info.holidayName}` + (info.detail && info.detail.isWork ? ' (Masuk Kerja / Overtime Libur)' : '');
+    holidayBanner.textContent =
+      `🗓️ Tanggal Merah: ${info.holidayName}` +
+      (info.detail && info.detail.isWork ? ' (Masuk Kerja / Overtime Libur)' : '');
     holidayBanner.classList.remove('hidden');
   } else {
     holidayBanner.classList.add('hidden');
@@ -451,7 +456,7 @@ function openHolidayModal() {
   if (sortedDates.length === 0) {
     list.innerHTML = '<li>Belum ada data tanggal merah untuk tahun ini.</li>';
   } else {
-    sortedDates.forEach(date => {
+    sortedDates.forEach((date) => {
       const li = document.createElement('li');
       li.innerHTML = `<span><strong>${date}</strong>: ${activeHolidaysMap[date]}</span>`;
       const delBtn = document.createElement('button');
@@ -472,7 +477,7 @@ function openHolidayModal() {
 }
 
 function highlightActiveGenButton() {
-  document.querySelectorAll('.btn-gen').forEach(btn => {
+  document.querySelectorAll('.btn-gen').forEach((btn) => {
     btn.classList.toggle('active', Number(btn.dataset.months) === state.generateMonths);
   });
 }
@@ -487,7 +492,7 @@ function setupEventListeners() {
     renderAll();
   });
 
-  document.querySelectorAll('.btn-gen').forEach(btn => {
+  document.querySelectorAll('.btn-gen').forEach((btn) => {
     btn.addEventListener('click', () => {
       state.generateMonths = Number(btn.dataset.months);
       highlightActiveGenButton();
@@ -556,7 +561,6 @@ function setupEventListeners() {
     document.getElementById('day-modal').classList.add('hidden');
   });
 
-  // Modal Gaji
   document.getElementById('btn-open-salary').addEventListener('click', openSalaryModal);
   document.getElementById('close-salary-modal').addEventListener('click', () => {
     document.getElementById('salary-modal').classList.add('hidden');
@@ -573,7 +577,6 @@ function setupEventListeners() {
     renderMonthlyReport();
   });
 
-  // Modal Tanggal Merah
   document.getElementById('btn-open-holiday').addEventListener('click', openHolidayModal);
   document.getElementById('close-holiday-modal').addEventListener('click', () => {
     document.getElementById('holiday-modal').classList.add('hidden');
@@ -585,7 +588,7 @@ function setupEventListeners() {
     if (!dateVal || !nameVal) return alert('Isi tanggal dan nama libur terlebih dahulu.');
 
     state.customHolidays[dateVal] = nameVal;
-    state.deletedHolidays = state.deletedHolidays.filter(d => d !== dateVal);
+    state.deletedHolidays = state.deletedHolidays.filter((d) => d !== dateVal);
     saveState();
 
     document.getElementById('new-holiday-date').value = '';
