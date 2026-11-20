@@ -47,14 +47,20 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 6px;
 }
 
 .app-header h1 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 
 .subtitle {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #94a3b8;
   margin-top: 4px;
 }
@@ -87,12 +93,16 @@ body {
   font-weight: 600;
 }
 
-input[type="date"], input[type="text"], select {
+input[type="date"],
+input[type="text"],
+input[type="number"],
+select {
   padding: 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.95rem;
   width: 100%;
+  background: #fff;
 }
 
 .quick-gen span {
@@ -156,6 +166,17 @@ button:active {
   font-size: 0.9rem;
 }
 
+.btn-secondary {
+  background: #e2e8f0;
+  color: var(--text-main);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
 /* Navigasi Kalender */
 .calendar-nav {
   display: flex;
@@ -194,6 +215,7 @@ button:active {
 .badge-legend.malam { background: var(--malam-bg); color: var(--malam-text); }
 .badge-legend.off { background: var(--off-bg); color: var(--off-text); }
 .badge-legend.leave { background: var(--leave-bg); color: var(--leave-text); }
+.badge-legend.confirmed { background: #e2e8f0; color: #0f172a; }
 .badge-legend.holiday-work {
   background: linear-gradient(135deg, #fef3c7, #f59e0b);
   color: #78350f;
@@ -217,7 +239,7 @@ button:active {
 }
 
 .day-cell {
-  min-height: 64px;
+  min-height: 72px;
   border-radius: 8px;
   padding: 4px;
   display: flex;
@@ -257,9 +279,9 @@ button:active {
   color: var(--off-text);
 }
 
+.day-cell.shift-CUTI,
 .day-cell.shift-SAKIT,
-.day-cell.shift-UNPAID,
-.day-cell.shift-CUTI {
+.day-cell.shift-UNPAID {
   background: var(--leave-bg);
   border-color: var(--leave-border);
   color: var(--leave-text);
@@ -281,6 +303,21 @@ button:active {
   font-weight: 700;
 }
 
+.day-indicators {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.confirm-mark {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
+  padding: 0 3px;
+}
+
 .holiday-dot {
   width: 7px;
   height: 7px;
@@ -290,7 +327,7 @@ button:active {
 }
 
 .day-badge {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 800;
   text-align: center;
   padding: 2px 0;
@@ -299,16 +336,78 @@ button:active {
 }
 
 .ot-flame {
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 700;
   text-align: center;
   color: #92400e;
 }
 
+.holiday-caption {
+  font-size: 0.56rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #78350f;
+}
+
+.month-holidays-box {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.month-holidays-box h4 {
+  font-size: 0.82rem;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.month-holidays-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+}
+
+.month-holidays-item {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #78350f;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
 /* Laporan Bulanan */
 .report-panel h3 {
   font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.report-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
   margin-bottom: 10px;
+}
+
+.unavailable-box {
+  background: #f8fafc;
+  border: 1px dashed #94a3b8;
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.unavailable-box p {
+  color: var(--text-main);
+  font-size: 0.92rem;
 }
 
 .report-grid {
@@ -337,7 +436,7 @@ button:active {
 }
 
 .stat-value {
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   font-weight: 800;
   color: var(--text-main);
 }
@@ -348,6 +447,7 @@ button:active {
   padding: 10px;
   border-radius: 8px;
   font-size: 0.85rem;
+  margin-bottom: 12px;
 }
 
 .leave-summary h4 {
@@ -362,6 +462,47 @@ button:active {
   gap: 4px;
 }
 
+.salary-summary {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.salary-summary h4 {
+  font-size: 0.9rem;
+  color: #14532d;
+  margin-bottom: 8px;
+}
+
+.salary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.salary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.salary-row.total {
+  border-top: 1px solid #86efac;
+  padding-top: 8px;
+  margin-top: 2px;
+  font-size: 0.95rem;
+  color: #14532d;
+}
+
+.kemnaker-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
 /* Modal */
 .modal {
   position: fixed;
@@ -374,8 +515,8 @@ button:active {
   z-index: 100;
 }
 
-.modal.hidden {
-  display: none;
+.hidden {
+  display: none !important;
 }
 
 .modal-content {
@@ -412,10 +553,6 @@ button:active {
   margin-bottom: 10px;
 }
 
-.holiday-alert.hidden {
-  display: none;
-}
-
 .info-text {
   font-size: 0.82rem;
   color: var(--text-muted);
@@ -435,7 +572,8 @@ button:active {
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .add-holiday-form {
