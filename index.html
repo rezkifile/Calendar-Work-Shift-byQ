@@ -1,215 +1,247 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Calendar Shift</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#142d2a">
+  <meta name="description" content="ShiftMate byQ - Aplikasi manajemen jadwal kerja">
+  <title>ShiftMate byQ</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-top">
-      <h1>Calendar Shift</h1>
-      <div class="header-actions">
-        <button id="btn-open-salary" class="btn-outline" title="Pengaturan Gaji & Tunjangan">💰 Gaji</button>
-        <button id="btn-open-holiday" class="btn-outline" title="Kelola Tanggal Merah">🗓️ Libur</button>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">S</div>
+      <div>
+        <h1>ShiftMate <span>byQ</span></h1>
+        <small>SHIFT MANAGEMENT SYSTEM</small>
       </div>
     </div>
-    <p class="subtitle">Pola 2 Pagi • 2 Malam • 2 Off (12 Jam/Shift • Lembur Kemnaker)</p>
+    <button class="icon-button" id="settingsShortcut"
+      aria-label="Pengaturan">⚙</button>
   </header>
 
   <main class="container">
-    <!-- Pengaturan Pola & Generate -->
-    <section class="card control-panel">
-      <div class="input-group">
-        <label for="start-date">Mulai Shift (Hari Pagi Pertama):</label>
-        <input type="date" id="start-date" />
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="dashboard">
+      <div class="welcome">
+        <span class="eyebrow">WORK SMARTER</span>
+        <h2>Halo, <span id="userGreeting">Operator</span>!</h2>
+        <p>Selamat datang di ShiftMate byQ.</p>
+        <div class="date-display" id="todayDate">Memuat tanggal...</div>
       </div>
 
-      <div class="quick-gen">
-        <span>Generate Jadwal:</span>
-        <div class="btn-group">
-          <button class="btn-gen" data-months="1">1 Bln</button>
-          <button class="btn-gen" data-months="3">3 Bln</button>
-          <button class="btn-gen" data-months="6">6 Bln</button>
-          <button class="btn-gen" data-months="12">12 Bln</button>
-        </div>
+      <h3>Ringkasan aktivitas</h3>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-icon green">▦</div>
+          <div class="stat-label">Jadwal Hari Ini</div>
+          <strong id="todayShift">--</strong>
+          <small id="todayShiftDesc">Belum diatur</small>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon blue">◷</div>
+          <div class="stat-label">Jam Kerja</div>
+          <strong>0 Jam</strong>
+          <small>Rekap bulan berjalan</small>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon orange">✓</div>
+          <div class="stat-label">Kehadiran</div>
+          <strong>0 Hari</strong>
+          <small>Belum ada konfirmasi</small>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon purple">Rp</div>
+          <div class="stat-label">Estimasi Gaji</div>
+          <strong>Rp 0</strong>
+          <small>Belum dihitung</small>
+        </article>
+      </div>
+
+      <div class="section-heading">
+        <h3>Menu utama</h3>
+        <span class="muted">Navigasi aplikasi</span>
+      </div>
+
+      <div class="menu-grid">
+        <button class="menu-card" data-page="calendar">
+          <span class="menu-icon green">▦</span>
+          <strong>Kalender Shift</strong>
+          <small>Jadwal kerja</small>
+        </button>
+
+        <button class="menu-card" data-page="attendance">
+          <span class="menu-icon blue">✓</span>
+          <strong>Kehadiran</strong>
+          <small>Konfirmasi masuk</small>
+        </button>
+
+        <button class="menu-card" data-page="reports">
+          <span class="menu-icon orange">▤</span>
+          <strong>Laporan</strong>
+          <small>Rekap bulanan</small>
+        </button>
+
+        <button class="menu-card" data-page="salary">
+          <span class="menu-icon purple">Rp</span>
+          <strong>Penghasilan</strong>
+          <small>Gaji dan lembur</small>
+        </button>
+      </div>
+
+      <div class="notice">
+        <strong>Informasi pengembangan</strong>
+        <p>ShiftMate byQ sedang dalam tahap pembangunan. Fitur akan ditambahkan secara bertahap.</p>
       </div>
     </section>
 
-    <!-- Navigasi Bulan -->
-    <section class="calendar-nav">
-      <button id="prev-month" class="nav-btn">◀</button>
-      <h2 id="current-month-label">Memuat...</h2>
-      <button id="next-month" class="nav-btn">▶</button>
-    </section>
-
-    <!-- Legenda Warna -->
-    <div class="legend">
-      <span class="badge-legend pagi">Pagi (07-19)</span>
-      <span class="badge-legend malam">Malam (19-07)</span>
-      <span class="badge-legend off">Off</span>
-      <span class="badge-legend holiday-work">🔥 Kerja Tgl Merah</span>
-      <span class="badge-legend leave">Cuti/Sakit/Unpaid</span>
-      <span class="badge-legend confirmed">✓ Dikonfirmasi</span>
-    </div>
-
-    <!-- Grid Kalender -->
-    <section class="card calendar-wrapper">
-      <div class="weekdays">
-        <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+    <!-- KALENDER -->
+    <section class="page" id="calendar">
+      <div class="page-heading">
+        <span class="eyebrow">SCHEDULE</span>
+        <h2>Kalender Shift</h2>
+        <p>Pengelolaan jadwal kerja otomatis.</p>
       </div>
-      <div id="calendar-grid" class="days-grid"></div>
-
-      <div id="month-holidays-box" class="month-holidays-box hidden">
-        <h4>🗓️ Keterangan Tanggal Merah Bulan Ini</h4>
-        <ul id="month-holidays-list" class="month-holidays-list"></ul>
+      <div class="empty-state">
+        <div>▦</div>
+        <h3>Kalender belum tersedia</h3>
+        <p>Mesin rotasi 2 Pagi, 2 Malam, 2 Off akan dibuat pada Tahap 2.</p>
       </div>
     </section>
 
-    <!-- Laporan Bulanan Otomatis -->
-    <section class="card report-panel">
-      <h3>📊 Laporan Bulan <span id="report-month-name">-</span></h3>
+    <!-- KEHADIRAN -->
+    <section class="page" id="attendance">
+      <div class="page-heading">
+        <span class="eyebrow">ATTENDANCE</span>
+        <h2>Kehadiran</h2>
+        <p>Konfirmasi kehadiran harian.</p>
+      </div>
+      <div class="empty-state">
+        <div>✓</div>
+        <h3>Belum tersedia</h3>
+        <p>Fitur konfirmasi kehadiran akan dibuat pada Tahap 4.</p>
+      </div>
+    </section>
 
-      <!-- Pesan jika melihat bulan berikutnya -->
-      <div id="report-unavailable-box" class="unavailable-box hidden">
-        <p><strong>Laporan belum tersedia</strong> untuk bulan berikutnya.</p>
-        <small>Laporan kehadiran dan estimasi gaji hanya tersedia untuk bulan berjalan dan bulan sebelumnya.</small>
+    <!-- LAPORAN -->
+    <section class="page" id="reports">
+      <div class="page-heading">
+        <span class="eyebrow">REPORT</span>
+        <h2>Laporan Bulanan</h2>
+        <p>Rekap aktivitas dan jam kerja.</p>
+      </div>
+      <div class="empty-state">
+        <div>▤</div>
+        <h3>Belum ada laporan</h3>
+        <p>Data laporan akan tersedia setelah fitur kehadiran dibuat.</p>
+      </div>
+    </section>
+
+    <!-- PENGHASILAN -->
+    <section class="page" id="salary">
+      <div class="page-heading">
+        <span class="eyebrow">PAYROLL</span>
+        <h2>Penghasilan</h2>
+        <p>Pengaturan gaji dan tunjangan.</p>
+      </div>
+      <div class="empty-state">
+        <div>Rp</div>
+        <h3>Kalkulator belum tersedia</h3>
+        <p>Perhitungan gaji dan lembur akan dibuat pada Tahap 5.</p>
+      </div>
+    </section>
+
+    <!-- PENGATURAN -->
+    <section class="page" id="settings">
+      <div class="page-heading">
+        <span class="eyebrow">CONFIGURATION</span>
+        <h2>Pengaturan</h2>
+        <p>Atur identitas dan preferensi aplikasi.</p>
       </div>
 
-      <!-- Konten laporan aktif -->
-      <div id="report-content-box">
-        <p class="report-note">
-          Dihitung dari tanggal yang dikonfirmasi hadir (<strong>Ya</strong>): <strong id="stat-confirmed-days">0</strong> hari dikonfirmasi.
+      <form id="settingsForm" class="settings-card">
+        <label for="userName">Nama pengguna</label>
+        <input id="userName" type="text"
+          placeholder="Masukkan nama pengguna" maxlength="50">
+
+        <label for="appName">Nama aplikasi</label>
+        <input id="appName" type="text"
+          value="ShiftMate byQ" maxlength="50">
+
+        <label for="startDate">Tanggal awal rotasi</label>
+        <input id="startDate" type="date">
+
+        <p class="helper-text">
+          Tanggal awal rotasi akan digunakan sebagai Pagi pertama.
+          Mesin kalender akan diaktifkan pada Tahap 2.
         </p>
 
-        <div class="report-grid">
-          <div class="stat-box">
-            <span class="stat-label">Hari Kerja (Hadir)</span>
-            <span class="stat-value" id="stat-work-days">0 hari</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-label">Total Jam Kerja</span>
-            <span class="stat-value" id="stat-total-hours">0 jam</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-label">Jam Reguler</span>
-            <span class="stat-value" id="stat-reg-hours">0 jam</span>
-          </div>
-          <div class="stat-box highlight-ot">
-            <span class="stat-label">Jam Overtime</span>
-            <span class="stat-value" id="stat-ot-hours">0 jam</span>
-          </div>
-        </div>
+        <button type="submit" class="primary-button">
+          Simpan Pengaturan
+        </button>
+        <p id="saveMessage" class="save-message" aria-live="polite"></p>
+      </form>
 
-        <div class="leave-summary">
-          <h4>Tidak Masuk / Dikonfirmasi Tidak (<span id="stat-absent-total">0</span> Hari)</h4>
-          <ul>
-            <li>Cuti: <strong id="stat-leave">0</strong> hari</li>
-            <li>Sakit: <strong id="stat-sick">0</strong> hari</li>
-            <li>Unpaid: <strong id="stat-unpaid">0</strong> hari</li>
-          </ul>
+      <div class="settings-card">
+        <h3>Informasi aplikasi</h3>
+        <div class="info-row">
+          <span>Nama</span>
+          <strong>ShiftMate byQ</strong>
         </div>
-
-        <div class="salary-summary">
-          <h4>💵 Estimasi Gaji & Lembur (Kemnaker)</h4>
-          <div class="salary-rows">
-            <div class="salary-row">
-              <span>Gaji Pokok</span>
-              <strong id="stat-base-salary">Rp 0</strong>
-            </div>
-            <div class="salary-row">
-              <span>Total Tunjangan</span>
-              <strong id="stat-allowance">Rp 0</strong>
-            </div>
-            <div class="salary-row">
-              <span>Upah Lembur (OT)</span>
-              <strong id="stat-ot-pay">Rp 0</strong>
-            </div>
-            <div class="salary-row total">
-              <span>Estimasi Total Gaji</span>
-              <strong id="stat-total-salary">Rp 0</strong>
-            </div>
-          </div>
-          <small class="kemnaker-hint" id="kemnaker-hourly-info">Upah/jam reguler (1/173): Rp 0</small>
+        <div class="info-row">
+          <span>Versi</span>
+          <strong>1.0.0</strong>
+        </div>
+        <div class="info-row">
+          <span>Penyimpanan</span>
+          <strong>Local Storage</strong>
+        </div>
+        <div class="info-row">
+          <span>Platform</span>
+          <strong>Web Application</strong>
         </div>
       </div>
     </section>
+
   </main>
 
-  <!-- Modal Detail, Konfirmasi Kehadiran & Override Tanggal -->
-  <div id="day-modal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modal-date-title">Detail Tanggal</h3>
-        <button id="close-day-modal" class="close-btn">&times;</button>
-      </div>
-      <div id="modal-holiday-banner" class="holiday-alert hidden"></div>
-      <p id="modal-default-info" class="info-text"></p>
+  <!-- NAVIGASI BAWAH -->
+  <nav class="bottom-nav" aria-label="Navigasi utama">
+    <button class="nav-item active" data-page="dashboard">
+      <span>⌂</span>
+      <small>Home</small>
+    </button>
+    <button class="nav-item" data-page="calendar">
+      <span>▦</span>
+      <small>Kalender</small>
+    </button>
+    <button class="nav-item" data-page="attendance">
+      <span>✓</span>
+      <small>Hadir</small>
+    </button>
+    <button class="nav-item" data-page="reports">
+      <span>▤</span>
+      <small>Laporan</small>
+    </button>
+    <button class="nav-item" data-page="settings">
+      <span>⚙</span>
+      <small>Setting</small>
+    </button>
+  </nav>
 
-      <div class="form-group">
-        <label for="attendance-select">Konfirmasi Kehadiran (Untuk Laporan):</label>
-        <select id="attendance-select">
-          <option value="NONE">Belum Dikonfirmasi</option>
-          <option value="YA">Ya (Hadir — Reguler 8j + OT 4j)</option>
-          <option value="TIDAK">Tidak (Tidak Masuk)</option>
-        </select>
-      </div>
+  <footer>
+    <p>ShiftMate byQ © <span id="currentYear"></span></p>
+    <small>Built for smarter shift management.</small>
+  </footer>
 
-      <div id="absent-reason-group" class="form-group hidden">
-        <label for="absent-reason-select">Pilih Alasan Tidak Masuk:</label>
-        <select id="absent-reason-select">
-          <option value="CUTI">Cuti</option>
-          <option value="SAKIT">Sakit</option>
-          <option value="UNPAID">Unpaid</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="override-select">Ubah Pola Shift Tanggal Ini (Opsional):</label>
-        <select id="override-select">
-          <option value="DEFAULT">Ikuti Pola Rotasi Utama</option>
-          <option value="PAGI">Override: Shift Pagi (07:00 - 19:00)</option>
-          <option value="MALAM">Override: Shift Malam (19:00 - 07:00)</option>
-          <option value="OFF">Override: Off / Libur (0 Jam)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="override-note">Catatan (Opsional):</label>
-        <input type="text" id="override-note" placeholder="Contoh: Tukar shift dengan Budi" />
-      </div>
-
-      <div class="modal-actions">
-        <button id="reset-day-btn" class="btn-secondary">Reset Hari Ini</button>
-        <button id="save-override" class="btn-primary">Simpan Perubahan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Pengaturan Gaji Pokok & Total Tunjangan -->
-  <div id="salary-modal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Pengaturan Gaji & Lembur</h3>
-        <button id="close-salary-modal" class="close-btn">&times;</button>
-      </div>
-      <p class="info-text">
-        Perhitungan lembur mengikuti aturan Kemnaker (upah/jam = 1/173 × gaji pokok).
-      </p>
-
-      <div class="form-group">
-        <label for="input-base-salary">Gaji Pokok (Rp / bulan):</label>
-        <input type="number" id="input-base-salary" min="0" step="10000" placeholder="Contoh: 5000000" />
-      </div>
-
-      <div class="form-group">
-        <label for="input-allowance">Total Tunjangan Tetap (Rp / bulan):</label>
-        <input type="number" id="input-allowance" min="0" step="10000" placeholder="Contoh: 1000000" />
-      </div>
-
-      <div class="form-group">
-        <label for="input-workday-scheme">Skema Hari Kerja Kemnaker:</label>
-        <select id="input-workday-scheme">
-          <option value="6">6 Hari Kerja / Minggu (40 Jam/Minggu)</option>
-          <option value="5
+  <script src="app.js"></script>
+</body>
+</html>
