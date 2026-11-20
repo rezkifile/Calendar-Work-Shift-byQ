@@ -10,9 +10,12 @@
   <header class="app-header">
     <div class="header-top">
       <h1>Calendar Shift</h1>
-      <button id="btn-open-holiday" class="btn-outline" title="Kelola Tanggal Merah">🗓️ Libur Nasional</button>
+      <div class="header-actions">
+        <button id="btn-open-salary" class="btn-outline" title="Pengaturan Gaji & Tunjangan">💰 Gaji</button>
+        <button id="btn-open-holiday" class="btn-outline" title="Kelola Tanggal Merah">🗓️ Libur</button>
+      </div>
     </div>
-    <p class="subtitle">Pola 2 Pagi • 2 Malam • 2 Off (12 Jam/Shift)</p>
+    <p class="subtitle">Pola 2 Pagi • 2 Malam • 2 Off (12 Jam/Shift • Lembur Kemnaker)</p>
   </header>
 
   <main class="container">
@@ -47,7 +50,8 @@
       <span class="badge-legend malam">Malam (19-07)</span>
       <span class="badge-legend off">Off</span>
       <span class="badge-legend holiday-work">🔥 Kerja Tgl Merah</span>
-      <span class="badge-legend leave">Izin/Cuti</span>
+      <span class="badge-legend leave">Cuti/Sakit/Unpaid</span>
+      <span class="badge-legend confirmed">✓ Dikonfirmasi</span>
     </div>
 
     <!-- Grid Kalender -->
@@ -56,42 +60,84 @@
         <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
       </div>
       <div id="calendar-grid" class="days-grid"></div>
+
+      <div id="month-holidays-box" class="month-holidays-box hidden">
+        <h4>🗓️ Keterangan Tanggal Merah Bulan Ini</h4>
+        <ul id="month-holidays-list" class="month-holidays-list"></ul>
+      </div>
     </section>
 
     <!-- Laporan Bulanan Otomatis -->
     <section class="card report-panel">
       <h3>📊 Laporan Bulan <span id="report-month-name">-</span></h3>
-      <div class="report-grid">
-        <div class="stat-box">
-          <span class="stat-label">Hari Kerja</span>
-          <span class="stat-value" id="stat-work-days">0</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">Total Jam Kerja</span>
-          <span class="stat-value" id="stat-total-hours">0 jam</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">Jam Reguler</span>
-          <span class="stat-value" id="stat-reg-hours">0 jam</span>
-        </div>
-        <div class="stat-box highlight-ot">
-          <span class="stat-label">Jam Overtime</span>
-          <span class="stat-value" id="stat-ot-hours">0 jam</span>
-        </div>
+
+      <!-- Pesan jika melihat bulan berikutnya -->
+      <div id="report-unavailable-box" class="unavailable-box hidden">
+        <p><strong>Laporan belum tersedia</strong> untuk bulan berikutnya.</p>
+        <small>Laporan kehadiran dan estimasi gaji hanya tersedia untuk bulan berjalan dan bulan sebelumnya.</small>
       </div>
 
-      <div class="leave-summary">
-        <h4>Rincian Tidak Masuk (<span id="stat-absent-total">0</span> Hari)</h4>
-        <ul>
-          <li>Izin Sakit: <strong id="stat-sick">0</strong> hari</li>
-          <li>Izin Tanpa Dibayar: <strong id="stat-unpaid">0</strong> hari</li>
-          <li>Cuti: <strong id="stat-leave">0</strong> hari</li>
-        </ul>
+      <!-- Konten laporan aktif -->
+      <div id="report-content-box">
+        <p class="report-note">
+          Dihitung dari tanggal yang dikonfirmasi hadir (<strong>Ya</strong>): <strong id="stat-confirmed-days">0</strong> hari dikonfirmasi.
+        </p>
+
+        <div class="report-grid">
+          <div class="stat-box">
+            <span class="stat-label">Hari Kerja (Hadir)</span>
+            <span class="stat-value" id="stat-work-days">0 hari</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Total Jam Kerja</span>
+            <span class="stat-value" id="stat-total-hours">0 jam</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Jam Reguler</span>
+            <span class="stat-value" id="stat-reg-hours">0 jam</span>
+          </div>
+          <div class="stat-box highlight-ot">
+            <span class="stat-label">Jam Overtime</span>
+            <span class="stat-value" id="stat-ot-hours">0 jam</span>
+          </div>
+        </div>
+
+        <div class="leave-summary">
+          <h4>Tidak Masuk / Dikonfirmasi Tidak (<span id="stat-absent-total">0</span> Hari)</h4>
+          <ul>
+            <li>Cuti: <strong id="stat-leave">0</strong> hari</li>
+            <li>Sakit: <strong id="stat-sick">0</strong> hari</li>
+            <li>Unpaid: <strong id="stat-unpaid">0</strong> hari</li>
+          </ul>
+        </div>
+
+        <div class="salary-summary">
+          <h4>💵 Estimasi Gaji & Lembur (Kemnaker)</h4>
+          <div class="salary-rows">
+            <div class="salary-row">
+              <span>Gaji Pokok</span>
+              <strong id="stat-base-salary">Rp 0</strong>
+            </div>
+            <div class="salary-row">
+              <span>Total Tunjangan</span>
+              <strong id="stat-allowance">Rp 0</strong>
+            </div>
+            <div class="salary-row">
+              <span>Upah Lembur (OT)</span>
+              <strong id="stat-ot-pay">Rp 0</strong>
+            </div>
+            <div class="salary-row total">
+              <span>Estimasi Total Gaji</span>
+              <strong id="stat-total-salary">Rp 0</strong>
+            </div>
+          </div>
+          <small class="kemnaker-hint" id="kemnaker-hourly-info">Upah/jam reguler (1/173): Rp 0</small>
+        </div>
       </div>
     </section>
   </main>
 
-  <!-- Modal Detail & Override Tanggal -->
+  <!-- Modal Detail, Konfirmasi Kehadiran & Override Tanggal -->
   <div id="day-modal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">
@@ -102,15 +148,30 @@
       <p id="modal-default-info" class="info-text"></p>
 
       <div class="form-group">
-        <label for="override-select">Ubah Status / Pengecualian Tanggal Ini:</label>
+        <label for="attendance-select">Konfirmasi Kehadiran (Untuk Laporan):</label>
+        <select id="attendance-select">
+          <option value="NONE">Belum Dikonfirmasi</option>
+          <option value="YA">Ya (Hadir — Reguler 8j + OT 4j)</option>
+          <option value="TIDAK">Tidak (Tidak Masuk)</option>
+        </select>
+      </div>
+
+      <div id="absent-reason-group" class="form-group hidden">
+        <label for="absent-reason-select">Pilih Alasan Tidak Masuk:</label>
+        <select id="absent-reason-select">
+          <option value="CUTI">Cuti</option>
+          <option value="SAKIT">Sakit</option>
+          <option value="UNPAID">Unpaid</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="override-select">Ubah Pola Shift Tanggal Ini (Opsional):</label>
         <select id="override-select">
           <option value="DEFAULT">Ikuti Pola Rotasi Utama</option>
           <option value="PAGI">Override: Shift Pagi (07:00 - 19:00)</option>
           <option value="MALAM">Override: Shift Malam (19:00 - 07:00)</option>
           <option value="OFF">Override: Off / Libur (0 Jam)</option>
-          <option value="SAKIT">Tidak Masuk: Izin Sakit</option>
-          <option value="UNPAID">Tidak Masuk: Izin Tanpa Dibayar</option>
-          <option value="CUTI">Tidak Masuk: Cuti</option>
         </select>
       </div>
 
@@ -120,31 +181,35 @@
       </div>
 
       <div class="modal-actions">
+        <button id="reset-day-btn" class="btn-secondary">Reset Hari Ini</button>
         <button id="save-override" class="btn-primary">Simpan Perubahan</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Kelola Tanggal Merah Nasional -->
-  <div id="holiday-modal" class="modal hidden">
+  <!-- Modal Pengaturan Gaji Pokok & Total Tunjangan -->
+  <div id="salary-modal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Tanggal Merah Tahun <span id="holiday-year-label"></span></h3>
-        <button id="close-holiday-modal" class="close-btn">&times;</button>
+        <h3>Pengaturan Gaji & Lembur</h3>
+        <button id="close-salary-modal" class="close-btn">&times;</button>
       </div>
-      <p class="info-text">Data diambil otomatis & disimpan offline. Anda dapat menambah/menghapus secara manual.</p>
-      
-      <div class="add-holiday-form">
-        <input type="date" id="new-holiday-date" />
-        <input type="text" id="new-holiday-name" placeholder="Nama hari libur..." />
-        <button id="btn-add-holiday" class="btn-primary">Tambah</button>
+      <p class="info-text">
+        Perhitungan lembur mengikuti aturan Kemnaker (upah/jam = 1/173 × gaji pokok).
+      </p>
+
+      <div class="form-group">
+        <label for="input-base-salary">Gaji Pokok (Rp / bulan):</label>
+        <input type="number" id="input-base-salary" min="0" step="10000" placeholder="Contoh: 5000000" />
       </div>
 
-      <ul id="holiday-list" class="holiday-list"></ul>
-      <button id="btn-refresh-holiday" class="btn-outline full-width">🔄 Sinkron Ulang API Nasional</button>
-    </div>
-  </div>
+      <div class="form-group">
+        <label for="input-allowance">Total Tunjangan Tetap (Rp / bulan):</label>
+        <input type="number" id="input-allowance" min="0" step="10000" placeholder="Contoh: 1000000" />
+      </div>
 
-  <script src="app.js"></script>
-</body>
-</html>
+      <div class="form-group">
+        <label for="input-workday-scheme">Skema Hari Kerja Kemnaker:</label>
+        <select id="input-workday-scheme">
+          <option value="6">6 Hari Kerja / Minggu (40 Jam/Minggu)</option>
+          <option value="5
